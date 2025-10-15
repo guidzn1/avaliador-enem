@@ -1,53 +1,65 @@
-# Ferramentas do Flask para criar o servidor
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-# Ferramenta para carregar nosso modelo salvo
 import joblib
 import os
+import pandas as pd
 
-# --- 1. CONFIGURAÇÃO INICIAL ---
+# Para evitar duplicar código, vamos importar a função do nosso script de pré-processamento
+import sys
+caminho_atual = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(caminho_atual, '..', 'src'))
+from preprocessamento import extrair_features
 
-# Cria a aplicação Flask (nosso servidor)
 app = Flask(__name__)
-# Permite que nosso frontend se comunique com o backend
 CORS(app)
 
-# --- 2. CARREGANDO OS MODELOS ---
 
-caminho_atual = os.path.dirname(os.path.abspath(__file__))
-caminho_modelo = os.path.join(caminho_atual, 'modelo_coesao.pkl')
-caminho_vetorizador = os.path.join(caminho_atual, 'vetorizador.pkl')
+# Carregando os NOVOS modelos para a nota final
+modelo = joblib.load(os.path.join(caminho_atual, 'modelo_nota_final_otimizado.pkl'))
+scaler = joblib.load(os.path.join(caminho_atual, 'scaler.pkl'))
+print("Modelo e scaler carregados com sucesso!")
 
-print("Carregando modelo e vetorizador...")
-modelo = joblib.load(caminho_modelo)
-vetorizador = joblib.load(caminho_vetorizador)
-print("Modelos carregados com sucesso!")
-
-# --- 3. DEFININDO A ROTA DA API ---
 @app.route('/prever', methods=['POST'])
 def prever_nota():
     dados = request.get_json()
-    if 'texto_redacao' not in dados:
-        return jsonify({'erro': 'Nenhum texto de redação foi fornecido!'}), 400
-
-    texto = dados['texto_redacao']
     
-    texto_para_vetorizar = [texto]
-    vetor_texto = vetorizador.transform(texto_para_vetorizar)
-    nota_prevista = modelo.predict(vetor_texto)
+    # Validação dos dados de entrada
+    if 'texto_redacao' not in dados or not dados['texto_redacao'].strip():
+        return jsonify({'erro': 'O texto da redação não pode estar vazio!'}), 400
+    if 'tema' not in dados or not dados['tema'].strip():
+        return jsonify({'erro': 'O tema da redação não pode estar vazio!'}), 400
+
+    texto_redacao = dados['texto_redacao']
+    tema = dados['tema']
+    
+    # Combina o tema e a redação, assim como fizemos no treinamento
+    texto_combinado = tema + " " + texto_redacao
+    
+    # 1. Extrair as features do texto combinado
+    features = extrair_features(texto_combinado)
+    
+    # 2. Converter as features para o formato que o scaler espera (um DataFrame)
+    features_df = pd.DataFrame([features])
+    
+    # 3. Usar o scaler para normalizar as features
+    features_scaled = scaler.transform(features_df)
+    
+    # 4. Fazer a predição com os dados normalizados
+    nota_prevista = modelo.predict(features_scaled)
 
     nota_final = round(nota_prevista[0])
-
-    # --- INÍCIO DA CORREÇÃO ---
-    # Adicionamos uma "trava" para garantir que a nota fique no intervalo correto.
+    
+# Trava de segurança para a nota de 0 a 1000
     if nota_final < 0:
         nota_final = 0
-    elif nota_final > 200:
-        nota_final = 200
-    # --- FIM DA CORREÇÃO ---
+    elif nota_final > 1000:
+        nota_final = 1000
 
-    return jsonify({'nota_prevista_c4': nota_final})
+    # Retornar a nota final prevista
+    return jsonify({
+        'nota_final_prevista': nota_final,
+        'analise_detalhada': features
+    })
 
-# --- 4. EXECUTANDO O SERVIDOR ---
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
