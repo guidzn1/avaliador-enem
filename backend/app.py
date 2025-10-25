@@ -8,17 +8,19 @@ import pandas as pd
 import sys
 caminho_atual = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(caminho_atual, '..', 'src'))
-from preprocessamento import extrair_features
+from preprocessamento import extrair_features #
 
+# --- 1. CONFIGURAÇÃO INICIAL ---
 app = Flask(__name__)
-CORS(app)
+CORS(app) # Permite a comunicação com o nosso frontend
 
-
-# Carregando os NOVOS modelos para a nota final
+# --- 2. CARREGANDO OS MODELOS DE ML ---
+# Carrega o modelo otimizado (0-1000) e o scaler
 modelo = joblib.load(os.path.join(caminho_atual, 'modelo_nota_final_otimizado.pkl'))
 scaler = joblib.load(os.path.join(caminho_atual, 'scaler.pkl'))
-print("Modelo e scaler carregados com sucesso!")
+print("Modelo OTIMIZADO (Nota Final) e scaler carregados com sucesso!")
 
+# --- 3. ROTA DA API DE ANÁLISE ---
 @app.route('/prever', methods=['POST'])
 def prever_nota():
     dados = request.get_json()
@@ -49,17 +51,18 @@ def prever_nota():
 
     nota_final = round(nota_prevista[0])
     
-# Trava de segurança para a nota de 0 a 1000
+    # Trava de segurança para a nota de 0 a 1000
     if nota_final < 0:
         nota_final = 0
     elif nota_final > 1000:
         nota_final = 1000
 
-    # Retornar a nota final prevista
+    # Retornar a nota final prevista e a análise detalhada
     return jsonify({
         'nota_final_prevista': nota_final,
         'analise_detalhada': features
     })
 
+# --- 4. EXECUÇÃO ---
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

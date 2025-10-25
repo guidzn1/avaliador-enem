@@ -51,7 +51,6 @@ function App() {
       <div className="glass-container">
         <header className="App-header">
           <h1>Análise de Coesão Textual</h1>
-          <p>Uma interface moderna para o modelo de ML do seu projeto</p>
         </header>
 
         <main className="App-main">
