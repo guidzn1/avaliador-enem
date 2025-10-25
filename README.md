@@ -4,8 +4,8 @@ Este projeto é uma aplicação web *full-stack* que utiliza Machine Learning pa
 
 O sistema foi desenvolvido como parte de um trabalho acadêmico inspirado pela metodologia do artigo: *"Combinação de Modelos de Aprendizado de Máquina utilizando Teoria de Resposta ao Item para Avaliação de Coesão Textual em Redações no contexto do ENEM"*.
 
-![Interface do CoesIA](https://prnt.sc/cQf5kI2Wm9-h)
-*(Substitua este texto por um print da sua aplicação a funcionar!)*
+![Interface do CoesIA](frontend/imagens/coesia.png)
+
 
 ---
 
