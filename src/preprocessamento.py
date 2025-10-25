@@ -42,29 +42,25 @@ def preparar_dados(caminho_redacoes, caminho_temas):
     df_temas = pd.read_csv(caminho_temas)
 
     print("Juntando os dataframes...")
-    # --- CORREÇÃO APLICADA ---
-    # Como ambos os arquivos têm uma coluna 'title', o Pandas as renomeia para 'title_x' e 'title_y'.
-    # O tema que queremos é o do arquivo prompts.csv, que se tornará 'title_y'.
     df_completo = pd.merge(df_redacoes, df_temas, left_on='prompt', right_on='id')
 
-    # Selecionamos as colunas corretas: 'essay', 'title_y' (que é o tema), e 'c4'
-    # Selecionamos as colunas corretas: 'essay', 'title_y' (o tema), e 'score' (a nota final)
-    df_modelo = df_completo[['essay', 'title_y', 'score']].copy()
+    # --- CORREÇÃO AQUI ---
+    # Voltamos a usar 'c4' como a nossa coluna-alvo.
+    df_modelo = df_completo[['essay', 'title_y', 'c4']].copy()
     df_modelo.dropna(inplace=True)
 
     print("Combinando tema e redação em um único texto...")
-    # Cria a nova coluna combinando o tema ('title_y') e a redação ('essay')
     df_modelo['texto_combinado'] = df_modelo['title_y'] + " " + df_modelo['essay']
     
     print("Iniciando extração de características do texto combinado... Isso pode demorar.")
     features_df = df_modelo['texto_combinado'].apply(lambda texto: pd.Series(extrair_features(texto)))
     
-    # Reseta o índice para garantir o alinhamento correto ao concatenar
     features_df.reset_index(drop=True, inplace=True)
     df_modelo.reset_index(drop=True, inplace=True)
     
-
-    df_final = pd.concat([features_df, df_modelo['score']], axis=1)
+    # --- CORREÇÃO AQUI ---
+    # Selecionamos as colunas de features e a nota de coesão 'c4'
+    df_final = pd.concat([features_df, df_modelo['c4']], axis=1)
     
     print("Preparação de dados concluída.")
     return df_final
@@ -78,6 +74,5 @@ if __name__ == '__main__':
     print("\nVisualização dos dados processados:")
     print(dados_processados.head())
     
-    # Salva o arquivo final
     dados_processados.to_csv('dados/dados_processados.csv', index=False)
-    print("\nNovos dados processados (com tema) salvos com sucesso em 'dados/dados_processados.csv'")
+    print("\nNovos dados processados (para COESÃO) salvos com sucesso em 'dados/dados_processados.csv'")

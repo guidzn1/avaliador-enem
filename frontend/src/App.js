@@ -51,6 +51,7 @@ function App() {
       <div className="glass-container">
         <header className="App-header">
           <h1>Análise de Coesão Textual</h1>
+          <p>Uma interface moderna para o modelo de ML do seu projeto</p>
         </header>
 
         <main className="App-main">
@@ -88,12 +89,11 @@ function App() {
           {resultado && (
             <div className="results-area">
               <div className="score-card">
-                <h3>Nota Final Prevista</h3>
+                <h3>Nota Prevista (Coesão)</h3>
                 <p className="score">
-                  <span>{resultado.nota_final_prevista}</span> / 1000
+                  <span>{resultado.nota_prevista_c4}</span> / 200
                 </p>
               </div>
-             
               <div className="details-card">
                 <h3>Análise Detalhada</h3>
                 <ul>
