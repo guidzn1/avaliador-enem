@@ -4,7 +4,7 @@ Este projeto é uma aplicação web *full-stack* que utiliza Machine Learning pa
 
 O sistema foi desenvolvido como parte de um trabalho acadêmico inspirado pela metodologia do artigo: *"Combinação de Modelos de Aprendizado de Máquina utilizando Teoria de Resposta ao Item para Avaliação de Coesão Textual em Redações no contexto do ENEM"*.
 
-![Interface do CoesIA](<placeholder_para_sua_imagem.png>)
+![Interface do CoesIA](https://prnt.sc/cQf5kI2Wm9-h)
 *(Substitua este texto por um print da sua aplicação a funcionar!)*
 
 ---
@@ -61,15 +61,12 @@ python -m venv venv
 
 # 2. Ative o ambiente virtual
 # Windows
-.\venv\Scripts\activate
+.env\Scriptsctivate
 # macOS / Linux
 source venv/bin/activate
 
 # 3. Crie um arquivo requirements.txt na raiz do projeto
-# (Copie e cole o conteúdo abaixo nele)
 requirements.txt:
-
-Plaintext
 
 flask
 flask_cors
@@ -79,41 +76,44 @@ spacy
 xgboost
 notebook
 joblib
-Bash
 
 # 4. Instale todas as dependências do Python
 pip install -r requirements.txt
 
 # 5. Baixe o modelo de linguagem do Spacy
 python -m spacy download pt_core_news_sm
-2. Treino do Modelo de ML
-Antes de iniciar o servidor, precisa de treinar o modelo. O script treinar_modelo_otimizado.py fará todo o processo: pré-processamento, otimização com GridSearchCV e salvamento do modelo final.
+```
 
-Bash
+### 2. Treino do Modelo de ML
 
+Antes de iniciar o servidor, precisa de treinar o modelo. O script `treinar_modelo_otimizado.py` fará todo o processo: pré-processamento, otimização com GridSearchCV e salvamento do modelo final.
+
+```bash
 # 1. Execute o script de pré-processamento
 python src/preprocessamento.py
 
 # 2. Execute o script de treino otimizado
 # ATENÇÃO: Este processo pode levar vários minutos (ou horas)!
 python src/treinar_modelo_otimizado.py
-No final, os ficheiros modelo_coesao_otimizado.pkl e scaler.pkl estarão na pasta /backend.
+```
 
-3. Iniciar os Servidores
+No final, os ficheiros `modelo_coesao_otimizado.pkl` e `scaler.pkl` estarão na pasta `/backend`.
+
+### 3. Iniciar os Servidores
+
 Precisará de dois terminais abertos.
 
-Terminal 1: Iniciar o Backend (Python/Flask)
+#### Terminal 1: Iniciar o Backend (Python/Flask)
 
-Bash
-
+```bash
 # (Certifique-se de que o venv está ativo)
 python backend/app.py
+```
 O servidor estará a ser executado em http://127.0.0.1:5000.
 
-Terminal 2: Iniciar o Frontend (React)
+#### Terminal 2: Iniciar o Frontend (React)
 
-Bash
-
+```bash
 # 1. Navegue até à pasta do frontend
 cd frontend
 
@@ -122,9 +122,14 @@ npm install
 
 # 3. Inicie a aplicação React
 npm start
+```
 O seu navegador abrirá automaticamente em http://localhost:3000.
 
-📂 Estrutura do Projeto
+---
+
+## 📂 Estrutura do Projeto
+
+```
 /avaliador-enem/
 |
 |-- 📂 backend/
@@ -155,8 +160,13 @@ O seu navegador abrirá automaticamente em http://localhost:3000.
 |
 |-- 📄 requirements.txt              # Dependências do Python
 '-- 📄 README.md                     # Este ficheiro
-📈 Resultados e Aprendizagens
-O modelo RandomForestRegressor otimizado demonstrou ser robusto para a tarefa, prevendo redações de nota máxima (1000) com alta precisão para a coesão (ex: 170-187 / 200).
+```
+
+---
+
+## 📈 Resultados e Aprendizagens
+
+O modelo `RandomForestRegressor` otimizado demonstrou ser robusto para a tarefa, prevendo redações de nota máxima (1000) com alta precisão para a coesão (ex: 170-187 / 200).
 
 O modelo também se mostrou capaz de diferenciar textos de baixa qualidade (ex: 96 / 200), validando a sua capacidade de generalização.
 
